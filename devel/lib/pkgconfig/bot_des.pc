@@ -1,0 +1,8 @@
+prefix=/home/harsh/harsh25_ws/devel
+
+Name: bot_des
+Description: Description of bot_des
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

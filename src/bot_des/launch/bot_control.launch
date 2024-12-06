@@ -1,0 +1,16 @@
+<launch>
+  <!-- Load robot description -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find bot_des)/urdf/bot_urdf.urdf'" />
+
+  <!-- Gazebo ROS control plugin -->
+  <node name="gazebo_ros_control" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model bot_urdf" />
+
+  <!-- controller manager and spawn the differential drive controller -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" args="diff_drive_controller" output="screen" />
+
+  <!-- teleop_twist_keyboard node -->
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard" output="screen">
+    <remap from="cmd_vel" to="/cmd_vel" />
+  </node>
+</launch>
+

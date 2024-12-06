@@ -1,0 +1,38 @@
+<launch>
+  <!-- Load the URDF file into the parameter server -->
+  <param name="robot_description" 
+         command="$(find xacro)/xacro --inorder $(find bot_des)/urdf/bot_urdf.urdf" />
+
+  <!-- Load the controller configuration file -->
+  <rosparam file="$(find bot_des)/config/diff_drive_controller.yaml" command="load"/>
+
+  <!-- Launch the robot state publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+
+  <!-- Launch the joint state publisher GUI -->
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+  <!-- Spawn the robot in Gazebo using the URDF format -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="screen" 
+        args="-param robot_description -model bot_urdf -urdf" />
+
+  <!-- Start the Gazebo server with the custom world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find bot_world)/worlds/world_en_2.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- Spawn the diff drive controller -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="diff_drive_controller"/>
+
+  <!-- Start the teleop_twist_keyboard node to control the robot -->
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard" output="screen">
+    <remap from="cmd_vel" to="/cmd_vel" />
+  </node>
+</launch>
+
